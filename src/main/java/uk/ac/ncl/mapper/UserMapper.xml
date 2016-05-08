@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="uk.ac.ncl.mapper.UserMapper">
+
+
+    <insert id="add" useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+        insert into administrator (name,real_name,passwd,user_type,city_base_id) values(#{name},#{realName},#{passwd},#{userType},#{cityBaseId})
+    </insert>
+
+    <select id="getUserList" parameterType="map" resultType="uk.ac.ncl.Dao.UserMapper">
+        select u.* from user u where 1=1
+        <include refid="whereSQL" />
+        ORDER BY u.type,u.created ASC
+        <if test="size != null">
+            LIMIT #{size}
+            <if test="offset != null">
+                OFFSET #{offset}
+            </if>
+        </if>
+    </select>
+
+    <select id="getSize" resultType="int" parameterType="map">
+        SELECT COUNT (u.*) FROM user u WHERE 1 = 1
+        <include refid="whereSQL"/>
+    </select>
+
+    <sql id="whereSQL">
+        <if test="id != null">
+            and u.id = #{id}
+        </if>
+        <if test="username != null">
+            and u.username LIKE '%'||#{username}||'%'
+        </if>
+        <if test="name != null">
+            and u.name LIKE '%'||#{name}||'%'
+        </if>
+        <if test="password != null">
+            and u.password = #{password}
+        </if>
+
+        <if test="type != null">
+            and u.type = #{type}
+        </if>
+        <if test="isDeleted != null">
+            AND u.is_deleted = #{isDeleted}
+        </if>
+    </sql>
+    <!-- 更新信息 -->
+    <update id="update" parameterType="uk.ac.ncl.Model.User">
+        UPDATE user SET name=#{name},username=#{username} ,password=#{password},type=#{type},isDeleted=#{isDeleted},gmt_modified = now()
+        WHERE id = #{id}
+    </update>
+
+</mapper>
